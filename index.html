@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NIQUE SPORTS — Business Management</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#02718A',
+              dark: '#015669',
+              light: '#0388A6',
+              bg: '#E6F3F5'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 pb-24 antialiased selection:bg-brand selection:text-white">
+
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 shadow-xs">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-brand text-white flex items-center justify-center font-black tracking-wider shadow-sm">
+          NS
+        </div>
+        <div>
+          <h1 class="font-black text-lg leading-none tracking-tight text-slate-900">NIQUE SPORTS</h1>
+          <span class="text-[11px] font-medium text-slate-500">Jersey Management ERP</span>
+        </div>
+      </div>
+      
+      <!-- Role Selector & Bell -->
+      <div class="flex items-center gap-2">
+        <select id="roleSelector" onchange="handleRoleChange(this.value)" class="text-xs font-semibold bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-700 outline-none focus:border-brand">
+          <option value="OWNER">Role: OWNER</option>
+          <option value="145974">Mod: 145974</option>
+          <option value="638251">Mod: 638251</option>
+          <option value="924716">Mod: 924716</option>
+          <option value="317845">Mod: 317845</option>
+          <option value="751392">Mod: 751392</option>
+          <option value="486203">Mod: 486203</option>
+          <option value="829561">Mod: 829561</option>
+          <option value="563728">Mod: 563728</option>
+        </select>
+        
+        <button onclick="toggleRiderIssues()" class="relative p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span id="issueBadge" class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] flex items-center justify-center font-bold">1</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="max-w-md mx-auto px-4 pt-4">
+
+    <!-- FINANCIALS OVERVIEW (ONLY VISIBLE TO OWNER) -->
+    <section id="ownerFinanceCard" class="mb-5 bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <i data-lucide="wallet" class="w-3.5 h-3.5 text-brand"></i> Current Money Balances
+        </span>
+        <span class="text-xs font-black text-brand bg-brand-bg px-2.5 py-0.5 rounded-full">Total: ৳48,500</span>
+      </div>
+      <div class="grid grid-cols-4 gap-2 text-center">
+        <div class="bg-slate-50 border border-slate-200/60 p-2.5 rounded-xl">
+          <p class="text-[10px] font-semibold text-slate-500 uppercase">Cash</p>
+          <p class="text-sm font-bold text-slate-800">৳12,000</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-200/60 p-2.5 rounded-xl">
+          <p class="text-[10px] font-semibold text-slate-500 uppercase">bKash</p>
+          <p class="text-sm font-bold text-slate-800">৳24,500</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-200/60 p-2.5 rounded-xl">
+          <p class="text-[10px] font-semibold text-slate-500 uppercase">Nagad</p>
+          <p class="text-sm font-bold text-slate-800">৳7,000</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-200/60 p-2.5 rounded-xl">
+          <p class="text-[10px] font-semibold text-slate-500 uppercase">Bank</p>
+          <p class="text-sm font-bold text-slate-800">৳5,000</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODERATOR PERSONAL KPI CARD (VISIBLE ONLY TO MODERATOR) -->
+    <section id="modKpiCard" class="hidden mb-5 bg-brand text-white rounded-2xl p-4 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <div>
+          <h2 class="text-xs uppercase font-semibold text-brand-bg">Moderator Portal</h2>
+          <p id="modIdText" class="text-lg font-black tracking-tight">ID: 145974</p>
+        </div>
+        <div class="text-right">
+          <p class="text-[11px] text-brand-bg font-medium">Unpaid Bill</p>
+          <p class="text-xl font-black text-white">৳1,200</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-2 text-center text-slate-900">
+        <div class="bg-white/95 p-2 rounded-xl">
+          <p class="text-[10px] font-bold text-slate-500 uppercase">Pending</p>
+          <p class="text-sm font-bold text-amber-600">5</p>
+        </div>
+        <div class="bg-white/95 p-2 rounded-xl">
+          <p class="text-[10px] font-bold text-slate-500 uppercase">Delivered</p>
+          <p class="text-sm font-bold text-emerald-600">18</p>
+        </div>
+        <div class="bg-white/95 p-2 rounded-xl">
+          <p class="text-[10px] font-bold text-slate-500 uppercase">Earned</p>
+          <p class="text-sm font-bold text-brand">৳1,800</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB SWITCHING SECTIONS -->
+    
+    <!-- 1. ORDERS TAB -->
+    <div id="tabOrders" class="space-y-3">
+      <!-- Search and Filter Bar -->
+      <div class="flex items-center gap-2">
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3.5"></i>
+          <input type="text" placeholder="Search phone, name, parcel ID..." class="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
+        </div>
+        <button onclick="triggerCourierSync()" class="p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-700">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Order Cards List -->
+      <div id="ordersContainer" class="space-y-3">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+
+    <!-- 2. NEW ORDER TAB -->
+    <div id="tabNewOrder" class="hidden space-y-4">
+      <!-- Smart AI Paste Section -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-brand flex items-center gap-1.5 uppercase">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Smart AI Paste (Gemini)
+          </span>
+          <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Bangla/English</span>
+        </div>
+        <textarea id="aiPasteInput" rows="3" placeholder="Paste order message from Messenger / WhatsApp here..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-700 outline-none focus:border-brand"></textarea>
+        <button onclick="parseWithAI()" class="mt-2 w-full py-2 bg-brand-bg text-brand font-bold text-xs rounded-xl hover:bg-brand hover:text-white transition-colors flex items-center justify-center gap-1.5">
+          <i data-lucide="wand-2" class="w-3.5 h-3.5"></i> Auto-Fill Fields
+        </button>
+      </div>
+
+      <!-- Order Entry Form -->
+      <form id="orderForm" onsubmit="submitNewOrder(event)" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+        <h3 class="text-sm font-bold text-slate-900 border-b pb-2">Order Information</h3>
+        
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Customer Name *</label>
+          <input type="text" id="custName" required placeholder="e.g. Tanvir Ahmed" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Phone Number (11 Digit) *</label>
+          <input type="tel" id="custPhone" required placeholder="017XXXXXXXX" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand font-mono">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Delivery Address *</label>
+          <textarea id="custAddress" required rows="2" placeholder="Full address with district & thana" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Jersey / Title</label>
+            <input type="text" id="jerseyTitle" placeholder="e.g. Madrid Retro 2017" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Size</label>
+            <select id="jerseySize" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand">
+              <option value="M">M</option>
+              <option value="L" selected>L</option>
+              <option value="XL">XL</option>
+              <option value="2XL">2XL</option>
+              <option value="3XL">3XL</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Custom Print -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Custom Name</label>
+            <input type="text" id="customName" placeholder="e.g. RONALDO" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand uppercase">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Number</label>
+            <input type="number" id="customNumber" placeholder="7" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand font-mono">
+          </div>
+        </div>
+
+        <!-- Independent COD and Advance -->
+        <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">COD Amount (৳) *</label>
+            <input type="number" id="orderCod" required value="1150" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-900 outline-none focus:border-brand">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">Advance Amount (৳)</label>
+            <input type="number" id="orderAdvance" value="200" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-900 outline-none focus:border-brand">
+          </div>
+          <div class="col-span-2 mt-1">
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Advance Received In Account:</label>
+            <select id="advanceAcc" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs font-semibold text-slate-700 outline-none">
+              <option value="bKash">bKash Merchant</option>
+              <option value="Nagad">Nagad Personal</option>
+              <option value="Cash">Cash in Hand</option>
+              <option value="Bank">City Bank</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-brand hover:bg-brand-dark text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2">
+          <i data-lucide="check-circle-2" class="w-4 h-4"></i> Create & Book Order
+        </button>
+      </form>
+    </div>
+
+    <!-- 3. CRM & RISK CHECK TAB -->
+    <div id="tabCrm" class="hidden space-y-4">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4">
+        <h3 class="text-sm font-bold text-slate-900 mb-2">Customer Courier History & Risk Analysis</h3>
+        <p class="text-xs text-slate-500 mb-3">Check delivery success ratio across Steadfast and Pathao records.</p>
+        <div class="flex gap-2">
+          <input type="tel" id="riskSearchPhone" placeholder="01XXXXXXXXX" class="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm font-mono outline-none focus:border-brand">
+          <button onclick="checkCustomerRisk()" class="px-4 py-2 bg-brand text-white font-bold text-xs rounded-xl hover:bg-brand-dark">Search</button>
+        </div>
+      </div>
+
+      <div id="crmResultCard" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+        <div class="flex justify-between items-start">
+          <div>
+            <h4 class="font-bold text-slate-900 text-sm">Tanvir Ahmed</h4>
+            <p class="text-xs text-slate-500 font-mono">01712345678 • Dhaka</p>
+          </div>
+          <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-black">
+            92.8% Trusted
+          </span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+          <div class="bg-slate-50 p-2 rounded-lg">
+            <span class="block text-slate-400 text-[10px]">Total Parcels</span>
+            <span class="font-bold text-slate-800">14</span>
+          </div>
+          <div class="bg-slate-50 p-2 rounded-lg">
+            <span class="block text-emerald-600 text-[10px]">Delivered</span>
+            <span class="font-bold text-emerald-700">13</span>
+          </div>
+          <div class="bg-slate-50 p-2 rounded-lg">
+            <span class="block text-rose-500 text-[10px]">Returned</span>
+            <span class="font-bold text-rose-600">1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. MORE / SETTINGS & CLOSING TAB -->
+    <div id="tabMore" class="hidden space-y-3">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
+        <h3 class="text-xs font-bold text-slate-400 uppercase">Daily Closing Report</h3>
+        <p class="text-xs text-slate-600">Generate a one-click summary formatted for WhatsApp closing.</p>
+        <button onclick="copyDailyClosing()" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2">
+          <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Today's Closing Summary
+        </button>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+        <h3 class="text-xs font-bold text-slate-400 uppercase">Courier Integrations</h3>
+        <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200/60">
+          <div>
+            <p class="text-xs font-bold text-slate-800">Steadfast Courier</p>
+            <p class="text-[10px] text-emerald-600 font-semibold">● Connected (API v1)</p>
+          </div>
+          <span class="text-xs font-mono text-slate-400">Packzy</span>
+        </div>
+        <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200/60">
+          <div>
+            <p class="text-xs font-bold text-slate-800">Pathao Courier</p>
+            <p class="text-[10px] text-slate-400 font-semibold">○ Ready for Credentials</p>
+          </div>
+          <span class="text-xs font-mono text-slate-400">OAuth 2.0</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FIXED MOBILE BOTTOM DOCK -->
+  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-3 shadow-lg">
+    <div class="max-w-md mx-auto grid grid-cols-4 gap-1">
+      <button onclick="switchTab('orders')" id="btnTabOrders" class="flex flex-col items-center py-1 text-brand font-bold">
+        <i data-lucide="package" class="w-5 h-5"></i>
+        <span class="text-[10px] mt-1">Orders</span>
+      </button>
+      <button onclick="switchTab('new')" id="btnTabNew" class="flex flex-col items-center py-1 text-slate-400 font-medium">
+        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+        <span class="text-[10px] mt-1">New Order</span>
+      </button>
+      <button onclick="switchTab('crm')" id="btnTabCrm" class="flex flex-col items-center py-1 text-slate-400 font-medium">
+        <i data-lucide="shield-check" class="w-5 h-5"></i>
+        <span class="text-[10px] mt-1">Risk CRM</span>
+      </button>
+      <button onclick="switchTab('more')" id="btnTabMore" class="flex flex-col items-center py-1 text-slate-400 font-medium">
+        <i data-lucide="sliders" class="w-5 h-5"></i>
+        <span class="text-[10px] mt-1">Closing</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- JAVASCRIPT BUSINESS LOGIC -->
+  <script>
+    // Initial State & Mock Data
+    let currentRole = "OWNER";
+    let orders = [
+      {
+        id: "NS-1001",
+        customerName: "Sabbir Hossain",
+        phone: "01823456789",
+        address: "Mirpur 10, Dhaka",
+        jersey: "Man United Retro 2008",
+        size: "XL",
+        customName: "RONALDO",
+        customNumber: "7",
+        cod: 1250,
+        advance: 200,
+        status: "Sent to Courier",
+        courier: "Steadfast",
+        consignmentId: "290891895",
+        riskRatio: 94.2,
+        modId: "145974"
+      },
+      {
+        id: "NS-1002",
+        customerName: "Fahim Reza",
+        phone: "01798765432",
+        address: "GEC Circle, Chittagong",
+        jersey: "Argentina 3 Star Fan",
+        size: "L",
+        customName: "MESSI",
+        customNumber: "10",
+        cod: 1100,
+        advance: 0,
+        status: "Call Pending",
+        courier: "Steadfast",
+        consignmentId: "290891902",
+        riskRatio: 78.5,
+        modId: "638251"
+      }
+    ];
+
+    function renderOrders() {
+      const container = document.getElementById('ordersContainer');
+      container.innerHTML = '';
+
+      const filteredOrders = currentRole === 'OWNER' 
+        ? orders 
+        : orders.filter(o => o.modId === currentRole);
+
+      filteredOrders.forEach(o => {
+        const isTrusted = o.riskRatio >= 90;
+        const card = document.createElement('div');
+        card.className = "bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3";
+        
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 text-sm">${o.customerName}</span>
+                <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-semibold">${o.id}</span>
+              </div>
+              <p class="text-xs text-slate-500 font-mono mt-0.5">${o.phone}</p>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${isTrusted ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
+              ${o.riskRatio}% ${isTrusted ? 'Trusted' : 'Risk'}
+            </span>
+          </div>
+
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 text-xs">
+            <p class="font-semibold text-slate-800">${o.jersey} (${o.size})</p>
+            <p class="text-slate-500 text-[11px]">Print: <span class="font-bold uppercase">${o.customName || 'None'} #${o.customNumber || '-'}</span></p>
+            <div class="flex justify-between items-center mt-2 pt-2 border-t border-slate-200/80 font-mono">
+              <span>COD: <strong class="text-slate-900 font-bold">৳${o.cod}</strong></span>
+              <span>Adv: <strong class="text-slate-900 font-bold">৳${o.advance}</strong></span>
+              <span class="text-brand font-bold">${o.status}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-1 gap-2">
+            <a href="tel:${o.phone}" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+              <i data-lucide="phone" class="w-3.5 h-3.5"></i> Call
+            </a>
+            <a href="https://wa.me/88${o.phone}?text=${encodeURIComponent('Hi ' + o.customerName + ', apnar NIQUE SPORTS jersey order (' + o.id + ') confirm kora hoyeche.')}" target="_blank" class="flex-1 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+              <i data-lucide="message-square" class="w-3.5 h-3.5"></i> WhatsApp
+            </a>
+            <button onclick="confirmOrder('${o.id}')" class="py-2 px-3 bg-brand text-white rounded-xl text-xs font-bold hover:bg-brand-dark">
+              Confirm
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    function switchTab(tab) {
+      document.getElementById('tabOrders').classList.add('hidden');
+      document.getElementById('tabNewOrder').classList.add('hidden');
+      document.getElementById('tabCrm').classList.add('hidden');
+      document.getElementById('tabMore').classList.add('hidden');
+
+      const tabs = ['btnTabOrders', 'btnTabNew', 'btnTabCrm', 'btnTabMore'];
+      tabs.forEach(id => {
+        const btn = document.getElementById(id);
+        btn.classList.remove('text-brand', 'font-bold');
+        btn.classList.add('text-slate-400', 'font-medium');
+      });
+
+      if (tab === 'orders') {
+        document.getElementById('tabOrders').classList.remove('hidden');
+        document.getElementById('btnTabOrders').classList.add('text-brand', 'font-bold');
+      } else if (tab === 'new') {
+        document.getElementById('tabNewOrder').classList.remove('hidden');
+        document.getElementById('btnTabNew').classList.add('text-brand', 'font-bold');
+      } else if (tab === 'crm') {
+        document.getElementById('tabCrm').classList.remove('hidden');
+        document.getElementById('btnTabCrm').classList.add('text-brand', 'font-bold');
+      } else if (tab === 'more') {
+        document.getElementById('tabMore').classList.remove('hidden');
+        document.getElementById('btnTabMore').classList.add('text-brand', 'font-bold');
+      }
+      lucide.createIcons();
+    }
+
+    function handleRoleChange(role) {
+      currentRole = role;
+      const ownerFinance = document.getElementById('ownerFinanceCard');
+      const modKpi = document.getElementById('modKpiCard');
+      const modIdText = document.getElementById('modIdText');
+
+      if (role === 'OWNER') {
+        ownerFinance.classList.remove('hidden');
+        modKpi.classList.add('hidden');
+      } else {
+        ownerFinance.classList.add('hidden');
+        modKpi.classList.remove('hidden');
+        modIdText.innerText = "ID: " + role;
+      }
+      renderOrders();
+    }
+
+    function parseWithAI() {
+      const text = document.getElementById('aiPasteInput').value;
+      if (!text) { alert("Please paste an order message first!"); return; }
+
+      // Rule-based regex extractor as Gemini fallback
+      const phoneMatch = text.match(/(?:\+?88)?01[3-9]\d{8}/);
+      if (phoneMatch) document.getElementById('custPhone').value = phoneMatch[0].replace('+88', '');
+
+      const sizeMatch = text.match(/\b(S|M|L|XL|2XL|3XL)\b/i);
+      if (sizeMatch) document.getElementById('jerseySize').value = sizeMatch[0].toUpperCase();
+
+      const codMatch = text.match(/COD[:\s]*(\d+)/i) || text.match(/দাম[:\s]*(\d+)/i);
+      if (codMatch) document.getElementById('orderCod').value = codMatch[1];
+
+      document.getElementById('custName').value = "Customer from Chat";
+      document.getElementById('custAddress').value = "Extracted from message: " + text.slice(0, 40) + "...";
+      alert("✨ Auto-filled extracted fields successfully!");
+    }
+
+    function submitNewOrder(e) {
+      e.preventDefault();
+      const newOrder = {
+        id: "NS-" + (1000 + orders.length + 1),
+        customerName: document.getElementById('custName').value,
+        phone: document.getElementById('custPhone').value,
+        address: document.getElementById('custAddress').value,
+        jersey: document.getElementById('jerseyTitle').value || 'Football Jersey',
+        size: document.getElementById('jerseySize').value,
+        customName: document.getElementById('customName').value,
+        customNumber: document.getElementById('customNumber').value,
+        cod: parseFloat(document.getElementById('orderCod').value),
+        advance: parseFloat(document.getElementById('orderAdvance').value),
+        status: "Call Pending",
+        courier: "Steadfast",
+        consignmentId: "2908" + Math.floor(10000 + Math.random() * 90000),
+        riskRatio: 90.0,
+        modId: currentRole === 'OWNER' ? '145974' : currentRole
+      };
+      orders.unshift(newOrder);
+      alert("✅ Order created and booked under Parcel ID: " + newOrder.consignmentId);
+      document.getElementById('orderForm').reset();
+      switchTab('orders');
+      renderOrders();
+    }
+
+    function confirmOrder(id) {
+      const ord = orders.find(o => o.id === id);
+      if (ord) {
+        ord.status = "Confirmed";
+        alert("Order " + id + " marked as Confirmed!");
+        renderOrders();
+      }
+    }
+
+    function triggerCourierSync() {
+      alert("🔄 Syncing live parcel statuses with Steadfast & Pathao APIs...");
+    }
+
+    function copyDailyClosing() {
+      const summary = `📊 NIQUE SPORTS — DAILY CLOSING REPORT\n━━━━━━━━━━━━━━━━━━━━━━\n📦 Total Booked: ${orders.length}\n💰 Advance Collected: ৳${orders.reduce((a,b)=>a+b.advance,0)}\n🚚 Total COD: ৳${orders.reduce((a,b)=>a+b.cod,0)}\n✅ Delivered: 18\n💼 Cash in Hand: ৳48,500\n━━━━━━━━━━━━━━━━━━━━━━`;
+      navigator.clipboard.writeText(summary);
+      alert("📋 Closing report copied to clipboard!");
+    }
+
+    function toggleRiderIssues() {
+      alert("🔔 Active Alert: 1 order facing delay at courier hub (Consignment #290891895)");
+    }
+
+    // Initial render
+    window.onload = () => {
+      renderOrders();
+      lucide.createIcons();
+    };
+  </script>
+</body>
+</html>
