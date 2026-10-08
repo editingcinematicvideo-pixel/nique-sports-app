@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NIQUE SPORTS — Business Management</title>
-  <!-- Tailwind CSS CDN -->
+  <title>NIQUE SPORTS — Enterprise Business Suite</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -17,7 +17,7 @@
               DEFAULT: '#02718A',
               dark: '#015669',
               light: '#0388A6',
-              bg: '#E6F3F5'
+              surface: '#F0F9FB'
             }
           }
         }
@@ -28,26 +28,30 @@
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .canvas-container { touch-action: none; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 pb-24 antialiased selection:bg-brand selection:text-white">
+<body class="bg-slate-100 text-slate-800 pb-28 antialiased selection:bg-brand selection:text-white">
 
-  <!-- TOP HEADER -->
+  <!-- TOP APP HEADER -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 shadow-xs">
-    <div class="max-w-md mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-xl bg-brand text-white flex items-center justify-center font-black tracking-wider shadow-sm">
+    <div class="max-w-xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-2xl bg-brand text-white flex items-center justify-center font-black tracking-wider shadow-sm">
           NS
         </div>
         <div>
-          <h1 class="font-black text-lg leading-none tracking-tight text-slate-900">NIQUE SPORTS</h1>
-          <span class="text-[11px] font-medium text-slate-500">Jersey Management ERP</span>
+          <h1 class="font-black text-lg leading-tight tracking-tight text-slate-900">NIQUE SPORTS</h1>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="currentRoleBadge" class="text-[11px] font-bold text-slate-500 uppercase">OWNER PORTAL</span>
+          </div>
         </div>
       </div>
       
-      <!-- Role Selector & Bell -->
+      <!-- Role Switcher & Rider Alert -->
       <div class="flex items-center gap-2">
-        <select id="roleSelector" onchange="handleRoleChange(this.value)" class="text-xs font-semibold bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-700 outline-none focus:border-brand">
+        <select id="roleSelector" onchange="switchRole(this.value)" class="text-xs font-bold bg-slate-100 border border-slate-300 rounded-xl px-2.5 py-2 text-slate-700 outline-none focus:border-brand cursor-pointer">
           <option value="OWNER">Role: OWNER</option>
           <option value="145974">Mod: 145974</option>
           <option value="638251">Mod: 638251</option>
@@ -59,137 +63,167 @@
           <option value="563728">Mod: 563728</option>
         </select>
         
-        <button onclick="toggleRiderIssues()" class="relative p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">
+        <button onclick="openRiderDrawer()" class="relative p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors">
           <i data-lucide="bell" class="w-4 h-4"></i>
-          <span id="issueBadge" class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] flex items-center justify-center font-bold">1</span>
+          <span id="issueCountBadge" class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] flex items-center justify-center font-black">1</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- MAIN APP CONTAINER -->
-  <main class="max-w-md mx-auto px-4 pt-4">
+  <!-- MAIN WRAPPER -->
+  <main class="max-w-xl mx-auto px-4 pt-4 space-y-4">
 
-    <!-- FINANCIALS OVERVIEW (ONLY VISIBLE TO OWNER) -->
-    <section id="ownerFinanceCard" class="mb-5 bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
+    <!-- 1. FINANCIAL SUMMARY (OWNER ONLY) -->
+    <section id="ownerFinanceSection" class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
       <div class="flex items-center justify-between mb-3">
-        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-          <i data-lucide="wallet" class="w-3.5 h-3.5 text-brand"></i> Current Money Balances
-        </span>
-        <span class="text-xs font-black text-brand bg-brand-bg px-2.5 py-0.5 rounded-full">Total: ৳48,500</span>
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="wallet" class="w-4 h-4 text-brand"></i>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Shop Accounts Ledger</h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openMoneyModal()" class="px-2.5 py-1 bg-brand-surface text-brand hover:bg-brand hover:text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1">
+            <i data-lucide="plus" class="w-3 h-3"></i> Add Money
+          </button>
+          <span id="totalShopBalance" class="text-xs font-black text-brand bg-slate-100 px-2.5 py-1 rounded-lg">Total: ৳0</span>
+        </div>
       </div>
       <div class="grid grid-cols-4 gap-2 text-center">
         <div class="bg-slate-50 border border-slate-200/60 p-2.5 rounded-xl">
-          <p class="text-[10px] font-semibold text-slate-500 uppercase">Cash</p>
-          <p class="text-sm font-bold text-slate-800">৳12,000</p>
+          <span class="text-[10px] font-bold text-slate-400 uppercase">Cash</span>
+          <p id="balCash" class="text-sm font-black text-slate-800">৳0</p>
         </div>
         <div class="bg-slate-50 border border-slate-200/60 p-2.5 rounded-xl">
-          <p class="text-[10px] font-semibold text-slate-500 uppercase">bKash</p>
-          <p class="text-sm font-bold text-slate-800">৳24,500</p>
+          <span class="text-[10px] font-bold text-slate-400 uppercase">bKash</span>
+          <p id="balBkash" class="text-sm font-black text-slate-800">৳0</p>
         </div>
         <div class="bg-slate-50 border border-slate-200/60 p-2.5 rounded-xl">
-          <p class="text-[10px] font-semibold text-slate-500 uppercase">Nagad</p>
-          <p class="text-sm font-bold text-slate-800">৳7,000</p>
+          <span class="text-[10px] font-bold text-slate-400 uppercase">Nagad</span>
+          <p id="balNagad" class="text-sm font-black text-slate-800">৳0</p>
         </div>
         <div class="bg-slate-50 border border-slate-200/60 p-2.5 rounded-xl">
-          <p class="text-[10px] font-semibold text-slate-500 uppercase">Bank</p>
-          <p class="text-sm font-bold text-slate-800">৳5,000</p>
+          <span class="text-[10px] font-bold text-slate-400 uppercase">Bank</span>
+          <p id="balBank" class="text-sm font-black text-slate-800">৳0</p>
         </div>
       </div>
     </section>
 
-    <!-- MODERATOR PERSONAL KPI CARD (VISIBLE ONLY TO MODERATOR) -->
-    <section id="modKpiCard" class="hidden mb-5 bg-brand text-white rounded-2xl p-4 shadow-sm">
-      <div class="flex justify-between items-center mb-3">
+    <!-- 2. MODERATOR PERSONAL KPI CARD (MODERATOR ONLY) -->
+    <section id="modKpiSection" class="hidden bg-brand text-white rounded-2xl p-4 shadow-sm space-y-3">
+      <div class="flex justify-between items-start">
         <div>
-          <h2 class="text-xs uppercase font-semibold text-brand-bg">Moderator Portal</h2>
-          <p id="modIdText" class="text-lg font-black tracking-tight">ID: 145974</p>
+          <span class="text-[10px] uppercase font-bold tracking-wider text-brand-surface">Moderator Workspace</span>
+          <p id="modDisplayId" class="text-xl font-black">ID: 145974</p>
+          <p class="text-xs text-brand-surface font-medium">Rate: <span id="modCommissionRate">৳50</span> / delivered order</p>
         </div>
         <div class="text-right">
-          <p class="text-[11px] text-brand-bg font-medium">Unpaid Bill</p>
-          <p class="text-xl font-black text-white">৳1,200</p>
+          <span class="text-[10px] uppercase font-bold tracking-wider text-brand-surface">Unpaid Balance</span>
+          <p id="modUnpaidBill" class="text-2xl font-black text-emerald-300">৳0</p>
         </div>
       </div>
-      <div class="grid grid-cols-3 gap-2 text-center text-slate-900">
+      <div class="grid grid-cols-3 gap-2 text-center text-slate-900 pt-1">
         <div class="bg-white/95 p-2 rounded-xl">
-          <p class="text-[10px] font-bold text-slate-500 uppercase">Pending</p>
-          <p class="text-sm font-bold text-amber-600">5</p>
+          <span class="text-[10px] font-bold text-slate-500 uppercase">Pending</span>
+          <p id="modPendingCount" class="text-sm font-black text-amber-600">0</p>
         </div>
         <div class="bg-white/95 p-2 rounded-xl">
-          <p class="text-[10px] font-bold text-slate-500 uppercase">Delivered</p>
-          <p class="text-sm font-bold text-emerald-600">18</p>
+          <span class="text-[10px] font-bold text-slate-500 uppercase">Delivered</span>
+          <p id="modDeliveredCount" class="text-sm font-black text-emerald-600">0</p>
         </div>
         <div class="bg-white/95 p-2 rounded-xl">
-          <p class="text-[10px] font-bold text-slate-500 uppercase">Earned</p>
-          <p class="text-sm font-bold text-brand">৳1,800</p>
+          <span class="text-[10px] font-bold text-slate-500 uppercase">Total Earned</span>
+          <p id="modEarnedTotal" class="text-sm font-black text-brand">৳0</p>
         </div>
       </div>
     </section>
 
-    <!-- TAB SWITCHING SECTIONS -->
-    
-    <!-- 1. ORDERS TAB -->
-    <div id="tabOrders" class="space-y-3">
-      <!-- Search and Filter Bar -->
-      <div class="flex items-center gap-2">
-        <div class="relative flex-1">
-          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3.5"></i>
-          <input type="text" placeholder="Search phone, name, parcel ID..." class="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none">
+    <!-- TAB VIEW 1: ORDERS LIST -->
+    <section id="viewOrders" class="space-y-3">
+      <!-- Search, Risk Filter & Sync -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-3 shadow-xs space-y-2">
+        <div class="flex items-center gap-2">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+            <input type="text" id="orderSearchInput" oninput="renderOrders()" placeholder="Search phone, name, parcel ID..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs focus:border-brand focus:ring-1 focus:ring-brand outline-none">
+          </div>
+          <button onclick="syncCouriers()" title="Sync Courier Status" class="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-700">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          </button>
         </div>
-        <button onclick="triggerCourierSync()" class="p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-700">
-          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+        <!-- Risk & Status Quick Filters -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-[11px] font-bold">
+          <button onclick="setFilter('ALL')" id="fltALL" class="px-2.5 py-1 rounded-lg bg-brand text-white whitespace-nowrap">All Orders</button>
+          <button onclick="setFilter('TRUSTED')" id="fltTRUSTED" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap">Trusted (>90%)</button>
+          <button onclick="setFilter('RISK')" id="fltRISK" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap">Risk (<85%)</button>
+          <button onclick="setFilter('PENDING')" id="fltPENDING" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap">Pending</button>
+          <button onclick="setFilter('DELIVERED')" id="fltDELIVERED" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap">Delivered</button>
+        </div>
+      </div>
+
+      <!-- Orders Feed -->
+      <div id="ordersFeed" class="space-y-3">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- TAB VIEW 2: NEW ORDER ENTRY & AI PARSE & CANVAS -->
+    <section id="viewNewOrder" class="hidden space-y-4">
+      
+      <!-- Smart AI Paste (Gemini + Regex) -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-brand flex items-center gap-1.5 uppercase tracking-wide">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Smart AI Order Parser
+          </span>
+          <span class="text-[10px] bg-brand-surface text-brand px-2 py-0.5 rounded-full font-bold">Bangla / Banglish</span>
+        </div>
+        <textarea id="aiRawInput" rows="3" placeholder="Paste unorganized order text from Messenger/WhatsApp here..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-700 outline-none focus:border-brand focus:ring-1 focus:ring-brand"></textarea>
+        <button onclick="parseOrderText()" class="mt-2 w-full py-2.5 bg-brand-surface text-brand font-bold text-xs rounded-xl hover:bg-brand hover:text-white transition-all flex items-center justify-center gap-1.5 shadow-2xs">
+          <i data-lucide="wand-2" class="w-3.5 h-3.5"></i> Extract & Auto-Fill Form
         </button>
       </div>
 
-      <!-- Order Cards List -->
-      <div id="ordersContainer" class="space-y-3">
-        <!-- Injected via JavaScript -->
-      </div>
-    </div>
-
-    <!-- 2. NEW ORDER TAB -->
-    <div id="tabNewOrder" class="hidden space-y-4">
-      <!-- Smart AI Paste Section -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-4">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-bold text-brand flex items-center gap-1.5 uppercase">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Smart AI Paste (Gemini)
-          </span>
-          <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Bangla/English</span>
+      <!-- Jersey Photo Editor Trigger -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex items-center justify-between">
+        <div>
+          <h4 class="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+            <i data-lucide="shirt" class="w-4 h-4 text-brand"></i> Jersey Name & Number Editor
+          </h4>
+          <p class="text-[11px] text-slate-500 mt-0.5">Custom font printing on jersey back view</p>
         </div>
-        <textarea id="aiPasteInput" rows="3" placeholder="Paste order message from Messenger / WhatsApp here..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-700 outline-none focus:border-brand"></textarea>
-        <button onclick="parseWithAI()" class="mt-2 w-full py-2 bg-brand-bg text-brand font-bold text-xs rounded-xl hover:bg-brand hover:text-white transition-colors flex items-center justify-center gap-1.5">
-          <i data-lucide="wand-2" class="w-3.5 h-3.5"></i> Auto-Fill Fields
+        <button onclick="openCanvasEditor()" class="px-3 py-2 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl flex items-center gap-1.5">
+          <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Open Editor
         </button>
       </div>
 
       <!-- Order Entry Form -->
-      <form id="orderForm" onsubmit="submitNewOrder(event)" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
-        <h3 class="text-sm font-bold text-slate-900 border-b pb-2">Order Information</h3>
+      <form id="newOrderForm" onsubmit="saveNewOrder(event)" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b pb-2">Customer & Delivery Info</h3>
         
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Customer Name *</label>
-          <input type="text" id="custName" required placeholder="e.g. Tanvir Ahmed" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Customer Full Name *</label>
+          <input type="text" id="inpName" required placeholder="e.g. Tanvir Chowdhury" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-brand">
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Phone Number (11 Digit) *</label>
-          <input type="tel" id="custPhone" required placeholder="017XXXXXXXX" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand font-mono">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number (11-digit Bangladesh) *</label>
+          <input type="tel" id="inpPhone" required placeholder="01XXXXXXXXX" onblur="checkPhoneRiskRealtime(this.value)" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-brand font-mono">
+          <div id="phoneRiskIndicator" class="mt-1 text-[11px] font-bold hidden"></div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Delivery Address *</label>
-          <textarea id="custAddress" required rows="2" placeholder="Full address with district & thana" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand"></textarea>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Delivery Address *</label>
+          <textarea id="inpAddress" required rows="2" placeholder="House, Road, Thana, District" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-brand"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Jersey / Title</label>
-            <input type="text" id="jerseyTitle" placeholder="e.g. Madrid Retro 2017" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Jersey / Item Title</label>
+            <input type="text" id="inpJersey" required placeholder="e.g. Real Madrid Retro 2017" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-brand">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Size</label>
-            <select id="jerseySize" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Size</label>
+            <select id="inpSize" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-brand font-bold">
               <option value="M">M</option>
               <option value="L" selected>L</option>
               <option value="XL">XL</option>
@@ -199,161 +233,295 @@
           </div>
         </div>
 
-        <!-- Custom Print -->
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Custom Name</label>
-            <input type="text" id="customName" placeholder="e.g. RONALDO" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand uppercase">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Custom Name</label>
+            <input type="text" id="inpCustomName" placeholder="e.g. RONALDO" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-brand uppercase font-mono">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Number</label>
-            <input type="number" id="customNumber" placeholder="7" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-brand font-mono">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Number</label>
+            <input type="number" id="inpCustomNumber" placeholder="7" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-brand font-mono">
           </div>
         </div>
 
-        <!-- Independent COD and Advance -->
-        <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
-          <div>
-            <label class="block text-xs font-bold text-slate-800 mb-1">COD Amount (৳) *</label>
-            <input type="number" id="orderCod" required value="1150" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-900 outline-none focus:border-brand">
+        <!-- INDEPENDENT COD AND ADVANCE -->
+        <div class="bg-brand-surface/60 border border-brand/20 p-3 rounded-2xl space-y-2">
+          <span class="text-[11px] font-black uppercase tracking-wider text-brand block">Financial Entries (COD & Advance are Independent)</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">COD Amount (৳) *</label>
+              <input type="number" id="inpCod" required value="1150" class="w-full bg-white border border-slate-300 rounded-xl p-2 text-sm font-black text-slate-900 outline-none focus:border-brand">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Advance Amount (৳)</label>
+              <input type="number" id="inpAdvance" value="0" class="w-full bg-white border border-slate-300 rounded-xl p-2 text-sm font-black text-slate-900 outline-none focus:border-brand">
+            </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-800 mb-1">Advance Amount (৳)</label>
-            <input type="number" id="orderAdvance" value="200" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-900 outline-none focus:border-brand">
-          </div>
-          <div class="col-span-2 mt-1">
-            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Advance Received In Account:</label>
-            <select id="advanceAcc" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs font-semibold text-slate-700 outline-none">
+            <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Deposit Advance Into Account:</label>
+            <select id="inpAdvanceAccount" class="w-full bg-white border border-slate-300 rounded-xl p-2 text-xs font-bold text-slate-700 outline-none">
               <option value="bKash">bKash Merchant</option>
               <option value="Nagad">Nagad Personal</option>
               <option value="Cash">Cash in Hand</option>
-              <option value="Bank">City Bank</option>
+              <option value="Bank">Bank Account</option>
             </select>
           </div>
         </div>
 
-        <button type="submit" class="w-full py-3 bg-brand hover:bg-brand-dark text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2">
-          <i data-lucide="check-circle-2" class="w-4 h-4"></i> Create & Book Order
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Courier Partner</label>
+          <select id="inpCourier" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 outline-none">
+            <option value="Steadfast">Steadfast Courier (Packzy)</option>
+            <option value="Pathao">Pathao Courier</option>
+          </select>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 bg-brand hover:bg-brand-dark text-white rounded-xl font-bold text-xs uppercase tracking-wider shadow-md transition-all flex items-center justify-center gap-2">
+          <i data-lucide="check-circle-2" class="w-4 h-4"></i> Create & Book Parcel
         </button>
       </form>
-    </div>
+    </section>
 
-    <!-- 3. CRM & RISK CHECK TAB -->
-    <div id="tabCrm" class="hidden space-y-4">
-      <div class="bg-white border border-slate-200 rounded-2xl p-4">
-        <h3 class="text-sm font-bold text-slate-900 mb-2">Customer Courier History & Risk Analysis</h3>
-        <p class="text-xs text-slate-500 mb-3">Check delivery success ratio across Steadfast and Pathao records.</p>
+    <!-- TAB VIEW 3: CRM & RISK SEARCH -->
+    <section id="viewCrm" class="hidden space-y-4">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Customer Risk & Delivery History</h3>
+        <p class="text-xs text-slate-600">Calculates customer lifetime courier delivery ratio (Delivered ÷ (Delivered + Returned) × 100).</p>
         <div class="flex gap-2">
-          <input type="tel" id="riskSearchPhone" placeholder="01XXXXXXXXX" class="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm font-mono outline-none focus:border-brand">
-          <button onclick="checkCustomerRisk()" class="px-4 py-2 bg-brand text-white font-bold text-xs rounded-xl hover:bg-brand-dark">Search</button>
+          <input type="tel" id="crmSearchPhone" placeholder="Enter customer 11-digit phone" class="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono outline-none focus:border-brand">
+          <button onclick="searchCrmCustomer()" class="px-4 py-2 bg-brand text-white font-bold text-xs rounded-xl hover:bg-brand-dark">Analyze</button>
         </div>
       </div>
-
-      <div id="crmResultCard" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
-        <div class="flex justify-between items-start">
-          <div>
-            <h4 class="font-bold text-slate-900 text-sm">Tanvir Ahmed</h4>
-            <p class="text-xs text-slate-500 font-mono">01712345678 • Dhaka</p>
-          </div>
-          <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-black">
-            92.8% Trusted
-          </span>
-        </div>
-        <div class="grid grid-cols-3 gap-2 text-center text-xs">
-          <div class="bg-slate-50 p-2 rounded-lg">
-            <span class="block text-slate-400 text-[10px]">Total Parcels</span>
-            <span class="font-bold text-slate-800">14</span>
-          </div>
-          <div class="bg-slate-50 p-2 rounded-lg">
-            <span class="block text-emerald-600 text-[10px]">Delivered</span>
-            <span class="font-bold text-emerald-700">13</span>
-          </div>
-          <div class="bg-slate-50 p-2 rounded-lg">
-            <span class="block text-rose-500 text-[10px]">Returned</span>
-            <span class="font-bold text-rose-600">1</span>
-          </div>
-        </div>
+      <div id="crmProfileOutput" class="space-y-3">
+        <!-- Rendered by JS -->
       </div>
-    </div>
+    </section>
 
-    <!-- 4. MORE / SETTINGS & CLOSING TAB -->
-    <div id="tabMore" class="hidden space-y-3">
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
-        <h3 class="text-xs font-bold text-slate-400 uppercase">Daily Closing Report</h3>
-        <p class="text-xs text-slate-600">Generate a one-click summary formatted for WhatsApp closing.</p>
-        <button onclick="copyDailyClosing()" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2">
-          <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Today's Closing Summary
+    <!-- TAB VIEW 4: SETTINGS, MOD BILLS & DAILY CLOSING -->
+    <section id="viewMore" class="hidden space-y-4">
+      <!-- Daily Closing Generator -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Daily Closing Report</h3>
+          <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Messenger / WA Format</span>
+        </div>
+        <p class="text-xs text-slate-600">Copy pre-calculated summary of all bookings, advances, and delivered numbers.</p>
+        <button onclick="generateDailyClosing()" class="w-full py-3 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-xs">
+          <i data-lucide="copy" class="w-4 h-4"></i> Generate & Copy Daily Closing
         </button>
       </div>
 
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
-        <h3 class="text-xs font-bold text-slate-400 uppercase">Courier Integrations</h3>
-        <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200/60">
-          <div>
-            <p class="text-xs font-bold text-slate-800">Steadfast Courier</p>
-            <p class="text-[10px] text-emerald-600 font-semibold">● Connected (API v1)</p>
-          </div>
-          <span class="text-xs font-mono text-slate-400">Packzy</span>
-        </div>
-        <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200/60">
-          <div>
-            <p class="text-xs font-bold text-slate-800">Pathao Courier</p>
-            <p class="text-[10px] text-slate-400 font-semibold">○ Ready for Credentials</p>
-          </div>
-          <span class="text-xs font-mono text-slate-400">OAuth 2.0</span>
+      <!-- Moderator Payout Bill (Owner Only) -->
+      <div id="ownerModBillSection" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Moderator Commission & Payout</h3>
+        <div class="space-y-2" id="modBillList">
+          <!-- Rendered by JS -->
         </div>
       </div>
-    </div>
+
+      <!-- Integration Settings (Owner Only) -->
+      <div id="ownerSettingsSection" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">API Credentials & Templates</h3>
+        <div class="space-y-2 text-xs">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">Steadfast API Key</label>
+            <input type="password" id="stfApiKey" value="sf_live_key_9823482349" class="w-full border border-slate-200 rounded-lg p-2 font-mono">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">Google Gemini API Key</label>
+            <input type="password" id="geminiApiKey" placeholder="AIzaSy..." class="w-full border border-slate-200 rounded-lg p-2 font-mono">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">Delivery Follow-up Promo Template</label>
+            <textarea id="waFollowupTemplate" rows="2" class="w-full border border-slate-200 rounded-lg p-2 text-[11px]">Hi {{customer_name}}, apnar jersey delivery hoyeche. Kemon legeche? Next order-e 5% discount thakche!</textarea>
+          </div>
+          <button onclick="saveSettings()" class="w-full py-2.5 bg-brand text-white font-bold rounded-xl hover:bg-brand-dark">Save Configurations</button>
+        </div>
+      </div>
+    </section>
 
   </main>
 
-  <!-- FIXED MOBILE BOTTOM DOCK -->
-  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-3 shadow-lg">
-    <div class="max-w-md mx-auto grid grid-cols-4 gap-1">
-      <button onclick="switchTab('orders')" id="btnTabOrders" class="flex flex-col items-center py-1 text-brand font-bold">
+  <!-- FIXED BOTTOM NAVIGATION DOCK -->
+  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-4 shadow-lg">
+    <div class="max-w-xl mx-auto grid grid-cols-4 gap-1">
+      <button onclick="navigateTab('orders')" id="navOrders" class="flex flex-col items-center py-1 text-brand font-bold transition-all">
         <i data-lucide="package" class="w-5 h-5"></i>
         <span class="text-[10px] mt-1">Orders</span>
       </button>
-      <button onclick="switchTab('new')" id="btnTabNew" class="flex flex-col items-center py-1 text-slate-400 font-medium">
+      <button onclick="navigateTab('new')" id="navNew" class="flex flex-col items-center py-1 text-slate-400 font-semibold transition-all">
         <i data-lucide="plus-circle" class="w-5 h-5"></i>
         <span class="text-[10px] mt-1">New Order</span>
       </button>
-      <button onclick="switchTab('crm')" id="btnTabCrm" class="flex flex-col items-center py-1 text-slate-400 font-medium">
+      <button onclick="navigateTab('crm')" id="navCrm" class="flex flex-col items-center py-1 text-slate-400 font-semibold transition-all">
         <i data-lucide="shield-check" class="w-5 h-5"></i>
         <span class="text-[10px] mt-1">Risk CRM</span>
       </button>
-      <button onclick="switchTab('more')" id="btnTabMore" class="flex flex-col items-center py-1 text-slate-400 font-medium">
+      <button onclick="navigateTab('more')" id="navMore" class="flex flex-col items-center py-1 text-slate-400 font-semibold transition-all">
         <i data-lucide="sliders" class="w-5 h-5"></i>
-        <span class="text-[10px] mt-1">Closing</span>
+        <span class="text-[10px] mt-1">More</span>
       </button>
     </div>
   </nav>
 
-  <!-- JAVASCRIPT BUSINESS LOGIC -->
+  <!-- MODAL: JERSEY TOUCH / CANVAS PHOTO EDITOR -->
+  <div id="canvasModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-4 space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="text-sm font-black text-slate-900">Jersey Customizer Canvas</h3>
+        <button onclick="closeCanvasEditor()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      
+      <!-- Canvas Preview Area -->
+      <div class="relative bg-slate-900 rounded-2xl overflow-hidden flex items-center justify-center h-64 border border-slate-700">
+        <canvas id="jerseyCanvas" width="300" height="300" class="canvas-container"></canvas>
+      </div>
+
+      <!-- Controls -->
+      <div class="space-y-2 text-xs">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-500 uppercase">Player Name</label>
+            <input type="text" id="cnvName" value="RONALDO" oninput="drawJersey()" class="w-full border border-slate-200 rounded-lg p-2 font-black uppercase text-center">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-500 uppercase">Squad Number</label>
+            <input type="number" id="cnvNum" value="7" oninput="drawJersey()" class="w-full border border-slate-200 rounded-lg p-2 font-black text-center font-mono">
+          </div>
+        </div>
+        <div class="flex items-center justify-between pt-1">
+          <span class="text-[11px] font-bold text-slate-600">Font Print Color:</span>
+          <div class="flex gap-2">
+            <button onclick="setPrintColor('#FFFFFF')" class="w-6 h-6 rounded-full bg-white border border-slate-300 shadow-xs"></button>
+            <button onclick="setPrintColor('#FCD34D')" class="w-6 h-6 rounded-full bg-amber-300 border border-amber-400 shadow-xs"></button>
+            <button onclick="setPrintColor('#000000')" class="w-6 h-6 rounded-full bg-black shadow-xs"></button>
+            <button onclick="setPrintColor('#DC2626')" class="w-6 h-6 rounded-full bg-red-600 shadow-xs"></button>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="saveJerseyCanvas()" class="w-full py-2.5 bg-brand text-white font-bold text-xs rounded-xl hover:bg-brand-dark flex items-center justify-center gap-1.5">
+        <i data-lucide="check" class="w-4 h-4"></i> Apply Design to Order
+      </button>
+    </div>
+  </div>
+
+  <!-- SLIDE-OVER: RIDER ISSUE DRAWER -->
+  <div id="riderDrawer" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex justify-end">
+    <div class="bg-white w-full max-w-sm h-full p-4 flex flex-col justify-between shadow-2xl">
+      <div>
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="p-2 bg-rose-50 text-rose-600 rounded-xl"><i data-lucide="alert-triangle" class="w-4 h-4"></i></span>
+            <h3 class="font-bold text-slate-900 text-sm">Active Courier Delays</h3>
+          </div>
+          <button onclick="closeRiderDrawer()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        
+        <div class="space-y-3" id="riderIssuesList">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+      <button onclick="closeRiderDrawer()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">Dismiss Drawer</button>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD MONEY TO LEDGER -->
+  <div id="moneyModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-xs w-full p-4 space-y-3 shadow-xl">
+      <h3 class="text-sm font-bold text-slate-900">Record Money Transaction</h3>
+      <div>
+        <label class="block text-[11px] font-bold text-slate-600 mb-1">Account</label>
+        <select id="moneyAcc" class="w-full border border-slate-200 rounded-xl p-2 text-xs font-bold">
+          <option value="Cash">Cash in Hand</option>
+          <option value="bKash">bKash Merchant</option>
+          <option value="Nagad">Nagad Personal</option>
+          <option value="Bank">Bank Account</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-slate-600 mb-1">Amount (৳)</label>
+        <input type="number" id="moneyAmt" placeholder="5000" class="w-full border border-slate-200 rounded-xl p-2 text-sm font-bold">
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-slate-600 mb-1">Note</label>
+        <input type="text" id="moneyNote" placeholder="e.g. Jersey sales money" class="w-full border border-slate-200 rounded-xl p-2 text-xs">
+      </div>
+      <div class="flex gap-2 pt-1">
+        <button onclick="closeMoneyModal()" class="flex-1 py-2 bg-slate-100 rounded-xl text-xs font-bold">Cancel</button>
+        <button onclick="saveMoneyEntry()" class="flex-1 py-2 bg-brand text-white rounded-xl text-xs font-bold">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PUBLIC CUSTOMER TRACKING SIMULATOR MODAL -->
+  <div id="trackingModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-4 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b pb-2">
+        <span class="text-xs font-black text-brand tracking-wider uppercase">Live Parcel Tracking</span>
+        <button onclick="closeTrackingModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div id="trackingModalContent" class="space-y-3">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT STATE ENGINE & CORE LOGIC -->
   <script>
-    // Initial State & Mock Data
-    let currentRole = "OWNER";
+    // 1. Core State
+    let activeRole = 'OWNER';
+    let currentFilter = 'ALL';
+    let printColor = '#FFFFFF';
+
+    // 8 Fixed Moderators DB Seed
+    let moderators = [
+      { id: "145974", name: "Mod-145974", rate: 50, paid: 500 },
+      { id: "638251", name: "Mod-638251", rate: 50, paid: 200 },
+      { id: "924716", name: "Mod-924716", rate: 50, paid: 0 },
+      { id: "317845", name: "Mod-317845", rate: 50, paid: 0 },
+      { id: "751392", name: "Mod-751392", rate: 50, paid: 0 },
+      { id: "486203", name: "Mod-486203", rate: 50, paid: 0 },
+      { id: "829561", name: "Mod-829561", rate: 50, paid: 0 },
+      { id: "563728", name: "Mod-563728", rate: 50, paid: 0 }
+    ];
+
+    // Accounts Ledger
+    let accounts = {
+      Cash: 12500,
+      bKash: 24000,
+      Nagad: 8000,
+      Bank: 15000
+    };
+
+    // Orders Seed
     let orders = [
       {
         id: "NS-1001",
-        customerName: "Sabbir Hossain",
+        trackingToken: "tk-98a72bc4",
+        name: "Sabbir Hossain",
         phone: "01823456789",
-        address: "Mirpur 10, Dhaka",
+        address: "Mirpur 10, Block C, Dhaka",
         jersey: "Man United Retro 2008",
         size: "XL",
         customName: "RONALDO",
         customNumber: "7",
         cod: 1250,
         advance: 200,
+        advanceAcc: "bKash",
         status: "Sent to Courier",
         courier: "Steadfast",
         consignmentId: "290891895",
+        trackingCode: "SFR981245",
         riskRatio: 94.2,
-        modId: "145974"
+        modId: "145974",
+        holdReason: "",
+        riderIssue: "Delay at hub: Address re-verification"
       },
       {
         id: "NS-1002",
-        customerName: "Fahim Reza",
+        trackingToken: "tk-41b99fe1",
+        name: "Fahim Reza",
         phone: "01798765432",
         address: "GEC Circle, Chittagong",
         jersey: "Argentina 3 Star Fan",
@@ -362,186 +530,500 @@
         customNumber: "10",
         cod: 1100,
         advance: 0,
+        advanceAcc: "Cash",
         status: "Call Pending",
         courier: "Steadfast",
         consignmentId: "290891902",
+        trackingCode: "SFR981288",
         riskRatio: 78.5,
-        modId: "638251"
+        modId: "638251",
+        holdReason: "",
+        riderIssue: ""
+      },
+      {
+        id: "NS-1003",
+        trackingToken: "tk-19df821a",
+        name: "Arif Rahman",
+        phone: "01911223344",
+        address: "Uttara Sector 7, Dhaka",
+        jersey: "Real Madrid 2024 Home",
+        size: "M",
+        customName: "BELLINGHAM",
+        customNumber: "5",
+        cod: 1350,
+        advance: 300,
+        advanceAcc: "Nagad",
+        status: "Delivered",
+        courier: "Steadfast",
+        consignmentId: "290891945",
+        trackingCode: "SFR981312",
+        riskRatio: 100.0,
+        modId: "145974",
+        holdReason: "",
+        riderIssue: ""
       }
     ];
 
+    // 2. Render Functions
+    function updateFinancesUI() {
+      document.getElementById('balCash').innerText = '৳' + accounts.Cash.toLocaleString();
+      document.getElementById('balBkash').innerText = '৳' + accounts.bKash.toLocaleString();
+      document.getElementById('balNagad').innerText = '৳' + accounts.Nagad.toLocaleString();
+      document.getElementById('balBank').innerText = '৳' + accounts.Bank.toLocaleString();
+      const total = accounts.Cash + accounts.bKash + accounts.Nagad + accounts.Bank;
+      document.getElementById('totalShopBalance').innerText = 'Total: ৳' + total.toLocaleString();
+    }
+
+    function updateModKpiUI() {
+      const myOrders = orders.filter(o => o.modId === activeRole);
+      const pending = myOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length;
+      const delivered = myOrders.filter(o => o.status === 'Delivered').length;
+      const mod = moderators.find(m => m.id === activeRole) || { rate: 50, paid: 0 };
+      
+      const earned = delivered * mod.rate;
+      const unpaid = earned - mod.paid;
+
+      document.getElementById('modPendingCount').innerText = pending;
+      document.getElementById('modDeliveredCount').innerText = delivered;
+      document.getElementById('modEarnedTotal').innerText = '৳' + earned;
+      document.getElementById('modUnpaidBill').innerText = '৳' + unpaid;
+      document.getElementById('modCommissionRate').innerText = '৳' + mod.rate;
+    }
+
     function renderOrders() {
-      const container = document.getElementById('ordersContainer');
-      container.innerHTML = '';
+      const feed = document.getElementById('ordersFeed');
+      feed.innerHTML = '';
 
-      const filteredOrders = currentRole === 'OWNER' 
-        ? orders 
-        : orders.filter(o => o.modId === currentRole);
+      const query = (document.getElementById('orderSearchInput').value || '').toLowerCase();
+      
+      let filtered = orders.filter(o => {
+        if (activeRole !== 'OWNER' && o.modId !== activeRole) return false;
+        if (query && !o.name.toLowerCase().includes(query) && !o.phone.includes(query) && !o.consignmentId.includes(query)) return false;
+        if (currentFilter === 'TRUSTED' && o.riskRatio < 90) return false;
+        if (currentFilter === 'RISK' && o.riskRatio >= 85) return false;
+        if (currentFilter === 'PENDING' && o.status === 'Delivered') return false;
+        if (currentFilter === 'DELIVERED' && o.status !== 'Delivered') return false;
+        return true;
+      });
 
-      filteredOrders.forEach(o => {
+      if (filtered.length === 0) {
+        feed.innerHTML = '<div class="text-center py-8 text-xs font-bold text-slate-400">No matching orders found.</div>';
+        return;
+      }
+
+      filtered.forEach(o => {
         const isTrusted = o.riskRatio >= 90;
         const card = document.createElement('div');
-        card.className = "bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3";
-        
+        card.className = "bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-3";
+
         card.innerHTML = `
           <div class="flex justify-between items-start">
             <div>
               <div class="flex items-center gap-2">
-                <span class="font-bold text-slate-900 text-sm">${o.customerName}</span>
-                <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-semibold">${o.id}</span>
+                <span class="font-black text-slate-900 text-sm">${o.name}</span>
+                <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-bold">${o.id}</span>
               </div>
               <p class="text-xs text-slate-500 font-mono mt-0.5">${o.phone}</p>
             </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${isTrusted ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black ${isTrusted ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
               ${o.riskRatio}% ${isTrusted ? 'Trusted' : 'Risk'}
             </span>
           </div>
 
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 text-xs">
-            <p class="font-semibold text-slate-800">${o.jersey} (${o.size})</p>
-            <p class="text-slate-500 text-[11px]">Print: <span class="font-bold uppercase">${o.customName || 'None'} #${o.customNumber || '-'}</span></p>
-            <div class="flex justify-between items-center mt-2 pt-2 border-t border-slate-200/80 font-mono">
-              <span>COD: <strong class="text-slate-900 font-bold">৳${o.cod}</strong></span>
-              <span>Adv: <strong class="text-slate-900 font-bold">৳${o.advance}</strong></span>
-              <span class="text-brand font-bold">${o.status}</span>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 text-xs space-y-1">
+            <div class="flex justify-between">
+              <span class="font-bold text-slate-800">${o.jersey} (${o.size})</span>
+              <span class="font-black text-brand">${o.courier} #${o.consignmentId}</span>
+            </div>
+            <p class="text-[11px] text-slate-500">Print: <strong class="text-slate-700 uppercase font-mono">${o.customName || 'None'} #${o.customNumber || '-'}</strong></p>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-200 font-mono text-[11px]">
+              <span>COD: <strong class="font-bold text-slate-900">৳${o.cod}</strong></span>
+              <span>Adv: <strong class="font-bold text-slate-900">৳${o.advance}</strong> (${o.advanceAcc})</span>
+              <span class="font-black ${o.status === 'Delivered' ? 'text-emerald-600' : 'text-amber-600'}">${o.status}</span>
             </div>
           </div>
 
-          <div class="flex items-center justify-between pt-1 gap-2">
-            <a href="tel:${o.phone}" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+          <!-- Quick Action Buttons -->
+          <div class="grid grid-cols-4 gap-1.5 pt-1">
+            <a href="tel:${o.phone}" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1">
               <i data-lucide="phone" class="w-3.5 h-3.5"></i> Call
             </a>
-            <a href="https://wa.me/88${o.phone}?text=${encodeURIComponent('Hi ' + o.customerName + ', apnar NIQUE SPORTS jersey order (' + o.id + ') confirm kora hoyeche.')}" target="_blank" class="flex-1 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-              <i data-lucide="message-square" class="w-3.5 h-3.5"></i> WhatsApp
+            <a href="https://wa.me/88${o.phone}?text=${encodeURIComponent('Hi ' + o.name + ', apnar NIQUE SPORTS order (' + o.id + ') confirm kora hoyeche.')}" target="_blank" class="py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 rounded-xl text-xs font-bold flex items-center justify-center gap-1">
+              <i data-lucide="message-square" class="w-3.5 h-3.5"></i> WA
             </a>
-            <button onclick="confirmOrder('${o.id}')" class="py-2 px-3 bg-brand text-white rounded-xl text-xs font-bold hover:bg-brand-dark">
-              Confirm
+            <button onclick="advanceOrderStatus('${o.id}')" class="py-2 bg-brand text-white rounded-xl text-xs font-bold hover:bg-brand-dark">
+              ${o.status === 'Call Pending' ? 'Confirm' : o.status === 'Confirmed' ? 'Pack' : o.status === 'Packed' ? 'Send' : 'Delivered'}
+            </button>
+            <button onclick="openTrackingModal('${o.id}')" class="py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-black">
+              Track
             </button>
           </div>
         `;
-        container.appendChild(card);
+        feed.appendChild(card);
       });
-
       lucide.createIcons();
     }
 
-    function switchTab(tab) {
-      document.getElementById('tabOrders').classList.add('hidden');
-      document.getElementById('tabNewOrder').classList.add('hidden');
-      document.getElementById('tabCrm').classList.add('hidden');
-      document.getElementById('tabMore').classList.add('hidden');
+    function renderModBills() {
+      const list = document.getElementById('modBillList');
+      list.innerHTML = '';
+      moderators.forEach(m => {
+        const deliveredCount = orders.filter(o => o.modId === m.id && o.status === 'Delivered').length;
+        const earned = deliveredCount * m.rate;
+        const unpaid = earned - m.paid;
 
-      const tabs = ['btnTabOrders', 'btnTabNew', 'btnTabCrm', 'btnTabMore'];
-      tabs.forEach(id => {
-        const btn = document.getElementById(id);
+        const row = document.createElement('div');
+        row.className = "flex justify-between items-center p-2.5 bg-slate-50 rounded-xl border border-slate-200/60 text-xs";
+        row.innerHTML = `
+          <div>
+            <p class="font-bold text-slate-900">${m.name}</p>
+            <p class="text-[10px] text-slate-500">${deliveredCount} Delivered • ৳${m.rate}/ord</p>
+          </div>
+          <div class="text-right">
+            <p class="font-black text-brand">Due: ৳${unpaid}</p>
+            <button onclick="payModerator('${m.id}', ${unpaid})" ${unpaid <= 0 ? 'disabled' : ''} class="mt-1 px-2.5 py-1 bg-brand text-white text-[10px] font-bold rounded-lg disabled:opacity-40">
+              Pay Bill
+            </button>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    // 3. Workflow Actions
+    function advanceOrderStatus(orderId) {
+      const o = orders.find(item => item.id === orderId);
+      if (!o) return;
+
+      if (o.status === 'Call Pending') o.status = 'Confirmed';
+      else if (o.status === 'Confirmed') o.status = 'Packed';
+      else if (o.status === 'Packed') o.status = 'Sent to Courier';
+      else if (o.status === 'Sent to Courier') o.status = 'Delivered';
+
+      renderOrders();
+      updateModKpiUI();
+      renderModBills();
+    }
+
+    function payModerator(modId, amount) {
+      if (amount <= 0) return;
+      const mod = moderators.find(m => m.id === modId);
+      if (!mod) return;
+      
+      const acc = prompt("Choose payment account (Cash, bKash, Nagad, Bank):", "bKash");
+      if (!accounts[acc]) { alert("Invalid Account!"); return; }
+      if (accounts[acc] < amount) { alert("Insufficient account balance!"); return; }
+
+      accounts[acc] -= amount;
+      mod.paid += amount;
+
+      alert(`✅ Paid ৳${amount} to ${mod.name} from ${acc}.`);
+      updateFinancesUI();
+      renderModBills();
+      updateModKpiUI();
+    }
+
+    function switchRole(role) {
+      activeRole = role;
+      document.getElementById('currentRoleBadge').innerText = role === 'OWNER' ? 'OWNER PORTAL' : 'MOD ' + role;
+      
+      if (role === 'OWNER') {
+        document.getElementById('ownerFinanceSection').classList.remove('hidden');
+        document.getElementById('ownerModBillSection').classList.remove('hidden');
+        document.getElementById('ownerSettingsSection').classList.remove('hidden');
+        document.getElementById('modKpiSection').classList.add('hidden');
+      } else {
+        document.getElementById('ownerFinanceSection').classList.add('hidden');
+        document.getElementById('ownerModBillSection').classList.add('hidden');
+        document.getElementById('ownerSettingsSection').classList.add('hidden');
+        document.getElementById('modKpiSection').classList.remove('hidden');
+        document.getElementById('modDisplayId').innerText = 'ID: ' + role;
+        updateModKpiUI();
+      }
+      renderOrders();
+    }
+
+    function setFilter(f) {
+      currentFilter = f;
+      ['ALL', 'TRUSTED', 'RISK', 'PENDING', 'DELIVERED'].forEach(id => {
+        const btn = document.getElementById('flt' + id);
+        if (id === f) {
+          btn.className = "px-2.5 py-1 rounded-lg bg-brand text-white whitespace-nowrap";
+        } else {
+          btn.className = "px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap";
+        }
+      });
+      renderOrders();
+    }
+
+    function navigateTab(tab) {
+      ['Orders', 'NewOrder', 'Crm', 'More'].forEach(v => document.getElementById('view' + v).classList.add('hidden'));
+      ['Orders', 'New', 'Crm', 'More'].forEach(n => {
+        const btn = document.getElementById('nav' + n);
         btn.classList.remove('text-brand', 'font-bold');
-        btn.classList.add('text-slate-400', 'font-medium');
+        btn.classList.add('text-slate-400', 'font-semibold');
       });
 
       if (tab === 'orders') {
-        document.getElementById('tabOrders').classList.remove('hidden');
-        document.getElementById('btnTabOrders').classList.add('text-brand', 'font-bold');
+        document.getElementById('viewOrders').classList.remove('hidden');
+        document.getElementById('navOrders').classList.add('text-brand', 'font-bold');
       } else if (tab === 'new') {
-        document.getElementById('tabNewOrder').classList.remove('hidden');
-        document.getElementById('btnTabNew').classList.add('text-brand', 'font-bold');
+        document.getElementById('viewNewOrder').classList.remove('hidden');
+        document.getElementById('navNew').classList.add('text-brand', 'font-bold');
       } else if (tab === 'crm') {
-        document.getElementById('tabCrm').classList.remove('hidden');
-        document.getElementById('btnTabCrm').classList.add('text-brand', 'font-bold');
+        document.getElementById('viewCrm').classList.remove('hidden');
+        document.getElementById('navCrm').classList.add('text-brand', 'font-bold');
       } else if (tab === 'more') {
-        document.getElementById('tabMore').classList.remove('hidden');
-        document.getElementById('btnTabMore').classList.add('text-brand', 'font-bold');
+        document.getElementById('viewMore').classList.remove('hidden');
+        document.getElementById('navMore').classList.add('text-brand', 'font-bold');
       }
       lucide.createIcons();
     }
 
-    function handleRoleChange(role) {
-      currentRole = role;
-      const ownerFinance = document.getElementById('ownerFinanceCard');
-      const modKpi = document.getElementById('modKpiCard');
-      const modIdText = document.getElementById('modIdText');
-
-      if (role === 'OWNER') {
-        ownerFinance.classList.remove('hidden');
-        modKpi.classList.add('hidden');
-      } else {
-        ownerFinance.classList.add('hidden');
-        modKpi.classList.remove('hidden');
-        modIdText.innerText = "ID: " + role;
-      }
-      renderOrders();
-    }
-
-    function parseWithAI() {
-      const text = document.getElementById('aiPasteInput').value;
+    // 4. Smart AI Parse with Fallback Regex
+    function parseOrderText() {
+      const text = document.getElementById('aiRawInput').value;
       if (!text) { alert("Please paste an order message first!"); return; }
 
-      // Rule-based regex extractor as Gemini fallback
+      // 11-digit Bangladesh phone matcher
       const phoneMatch = text.match(/(?:\+?88)?01[3-9]\d{8}/);
-      if (phoneMatch) document.getElementById('custPhone').value = phoneMatch[0].replace('+88', '');
+      if (phoneMatch) {
+        const p = phoneMatch[0].replace('+88', '');
+        document.getElementById('inpPhone').value = p;
+        checkPhoneRiskRealtime(p);
+      }
 
+      // Sizes
       const sizeMatch = text.match(/\b(S|M|L|XL|2XL|3XL)\b/i);
-      if (sizeMatch) document.getElementById('jerseySize').value = sizeMatch[0].toUpperCase();
+      if (sizeMatch) document.getElementById('inpSize').value = sizeMatch[0].toUpperCase();
 
-      const codMatch = text.match(/COD[:\s]*(\d+)/i) || text.match(/দাম[:\s]*(\d+)/i);
-      if (codMatch) document.getElementById('orderCod').value = codMatch[1];
+      // Custom print name & number
+      const numMatch = text.match(/(?:number|no|নং)[:\s]*(\d{1,2})/i);
+      if (numMatch) document.getElementById('inpCustomNumber').value = numMatch[1];
 
-      document.getElementById('custName').value = "Customer from Chat";
-      document.getElementById('custAddress').value = "Extracted from message: " + text.slice(0, 40) + "...";
-      alert("✨ Auto-filled extracted fields successfully!");
+      // Monetary figures
+      const codMatch = text.match(/COD[:\s]*(\d+)/i) || text.match(/বাকি[:\s]*(\d+)/i);
+      if (codMatch) document.getElementById('inpCod').value = codMatch[1];
+
+      const advMatch = text.match(/ADV[:\s]*(\d+)/i) || text.match(/অগ্রিম[:\s]*(\d+)/i);
+      if (advMatch) document.getElementById('inpAdvance').value = advMatch[1];
+
+      document.getElementById('inpName').value = "Customer from Chat";
+      document.getElementById('inpAddress').value = "Extracted: " + text.slice(0, 45);
+      alert("✨ Auto-filled extracted fields!");
     }
 
-    function submitNewOrder(e) {
-      e.preventDefault();
-      const newOrder = {
-        id: "NS-" + (1000 + orders.length + 1),
-        customerName: document.getElementById('custName').value,
-        phone: document.getElementById('custPhone').value,
-        address: document.getElementById('custAddress').value,
-        jersey: document.getElementById('jerseyTitle').value || 'Football Jersey',
-        size: document.getElementById('jerseySize').value,
-        customName: document.getElementById('customName').value,
-        customNumber: document.getElementById('customNumber').value,
-        cod: parseFloat(document.getElementById('orderCod').value),
-        advance: parseFloat(document.getElementById('orderAdvance').value),
-        status: "Call Pending",
-        courier: "Steadfast",
-        consignmentId: "2908" + Math.floor(10000 + Math.random() * 90000),
-        riskRatio: 90.0,
-        modId: currentRole === 'OWNER' ? '145974' : currentRole
-      };
-      orders.unshift(newOrder);
-      alert("✅ Order created and booked under Parcel ID: " + newOrder.consignmentId);
-      document.getElementById('orderForm').reset();
-      switchTab('orders');
-      renderOrders();
-    }
-
-    function confirmOrder(id) {
-      const ord = orders.find(o => o.id === id);
-      if (ord) {
-        ord.status = "Confirmed";
-        alert("Order " + id + " marked as Confirmed!");
-        renderOrders();
+    function checkPhoneRiskRealtime(phone) {
+      const el = document.getElementById('phoneRiskIndicator');
+      if (phone.length === 11) {
+        el.classList.remove('hidden');
+        el.innerHTML = '<span class="text-emerald-600">● 92.4% Delivery Ratio (Trusted Customer)</span>';
+      } else {
+        el.classList.add('hidden');
       }
     }
 
-    function triggerCourierSync() {
-      alert("🔄 Syncing live parcel statuses with Steadfast & Pathao APIs...");
-    }
+    // 5. Submit Order
+    function saveNewOrder(e) {
+      e.preventDefault();
+      const adv = parseFloat(document.getElementById('inpAdvance').value) || 0;
+      const advAcc = document.getElementById('inpAdvanceAccount').value;
 
-    function copyDailyClosing() {
-      const summary = `📊 NIQUE SPORTS — DAILY CLOSING REPORT\n━━━━━━━━━━━━━━━━━━━━━━\n📦 Total Booked: ${orders.length}\n💰 Advance Collected: ৳${orders.reduce((a,b)=>a+b.advance,0)}\n🚚 Total COD: ৳${orders.reduce((a,b)=>a+b.cod,0)}\n✅ Delivered: 18\n💼 Cash in Hand: ৳48,500\n━━━━━━━━━━━━━━━━━━━━━━`;
-      navigator.clipboard.writeText(summary);
-      alert("📋 Closing report copied to clipboard!");
-    }
+      const newOrd = {
+        id: "NS-" + (1000 + orders.length + 1),
+        trackingToken: "tk-" + Math.random().toString(36).substring(2, 10),
+        name: document.getElementById('inpName').value,
+        phone: document.getElementById('inpPhone').value,
+        address: document.getElementById('inpAddress').value,
+        jersey: document.getElementById('inpJersey').value,
+        size: document.getElementById('inpSize').value,
+        customName: document.getElementById('inpCustomName').value,
+        customNumber: document.getElementById('inpCustomNumber').value,
+        cod: parseFloat(document.getElementById('inpCod').value) || 0,
+        advance: adv,
+        advanceAcc: advAcc,
+        status: "Call Pending",
+        courier: document.getElementById('inpCourier').value,
+        consignmentId: "2908" + Math.floor(10000 + Math.random() * 90000),
+        trackingCode: "SFR" + Math.floor(100000 + Math.random() * 900000),
+        riskRatio: 91.5,
+        modId: activeRole === 'OWNER' ? '145974' : activeRole,
+        holdReason: "",
+        riderIssue: ""
+      };
 
-    function toggleRiderIssues() {
-      alert("🔔 Active Alert: 1 order facing delay at courier hub (Consignment #290891895)");
-    }
+      // Advance immediately deposited to chosen account
+      if (adv > 0) {
+        accounts[advAcc] += adv;
+        updateFinancesUI();
+      }
 
-    // Initial render
-    window.onload = () => {
+      orders.unshift(newOrd);
+      alert("✅ Order created and parcel booked!\nConsignment ID: " + newOrd.consignmentId);
+      document.getElementById('newOrderForm').reset();
+      navigateTab('orders');
       renderOrders();
+    }
+
+    // 6. Canvas Jersey Editor
+    function openCanvasEditor() {
+      document.getElementById('canvasModal').classList.remove('hidden');
+      drawJersey();
+      lucide.createIcons();
+    }
+    function closeCanvasEditor() {
+      document.getElementById('canvasModal').classList.add('hidden');
+    }
+    function setPrintColor(c) {
+      printColor = c;
+      drawJersey();
+    }
+    function drawJersey() {
+      const c = document.getElementById('jerseyCanvas');
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, 300, 300);
+
+      // Jersey Silhouette
+      ctx.fillStyle = "#02718A";
+      ctx.beginPath();
+      ctx.moveTo(80, 40);
+      ctx.lineTo(220, 40);
+      ctx.lineTo(260, 100);
+      ctx.lineTo(220, 120);
+      ctx.lineTo(220, 270);
+      ctx.lineTo(80, 270);
+      ctx.lineTo(80, 120);
+      ctx.lineTo(40, 100);
+      ctx.closePath();
+      ctx.fill();
+
+      // Collar Arc
+      ctx.fillStyle = "#0F172A";
+      ctx.beginPath();
+      ctx.arc(150, 40, 35, 0, Math.PI);
+      ctx.fill();
+
+      // Custom Name Text
+      const name = (document.getElementById('cnvName').value || 'RONALDO').toUpperCase();
+      ctx.fillStyle = printColor;
+      ctx.font = "bold 20px -apple-system, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(name, 150, 110);
+
+      // Custom Squad Number
+      const num = document.getElementById('cnvNum').value || '7';
+      ctx.font = "black 76px -apple-system, sans-serif";
+      ctx.fillText(num, 150, 195);
+    }
+    function saveJerseyCanvas() {
+      document.getElementById('inpCustomName').value = document.getElementById('cnvName').value;
+      document.getElementById('inpCustomNumber').value = document.getElementById('cnvNum').value;
+      closeCanvasEditor();
+      alert("✨ Design applied to the order form!");
+    }
+
+    // 7. Modals & Helpers
+    function openMoneyModal() { document.getElementById('moneyModal').classList.remove('hidden'); }
+    function closeMoneyModal() { document.getElementById('moneyModal').classList.add('hidden'); }
+    function saveMoneyEntry() {
+      const acc = document.getElementById('moneyAcc').value;
+      const amt = parseFloat(document.getElementById('moneyAmt').value) || 0;
+      if (amt <= 0) return;
+      accounts[acc] += amt;
+      updateFinancesUI();
+      closeMoneyModal();
+      alert(`✅ ৳${amt} added to ${acc}.`);
+    }
+
+    function openRiderDrawer() {
+      document.getElementById('riderDrawer').classList.remove('hidden');
+      const container = document.getElementById('riderIssuesList');
+      container.innerHTML = `
+        <div class="bg-rose-50 border border-rose-200 rounded-2xl p-3 space-y-2">
+          <div class="flex justify-between items-start">
+            <span class="font-black text-rose-900 text-xs">Sabbir Hossain</span>
+            <span class="text-[10px] bg-rose-200 text-rose-800 font-bold px-1.5 py-0.5 rounded">Delay</span>
+          </div>
+          <p class="text-xs text-rose-700">Hub Note: Recipient requested delivery on Friday afternoon.</p>
+          <div class="flex gap-2 pt-1">
+            <a href="tel:01823456789" class="flex-1 py-1.5 bg-rose-600 text-white text-center rounded-xl text-xs font-bold">Call Customer</a>
+            <a href="https://wa.me/8801823456789" class="flex-1 py-1.5 bg-white border border-rose-300 text-rose-700 text-center rounded-xl text-xs font-bold">WhatsApp</a>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+    function closeRiderDrawer() { document.getElementById('riderDrawer').classList.add('hidden'); }
+
+    function openTrackingModal(id) {
+      const o = orders.find(item => item.id === id);
+      if (!o) return;
+      const content = document.getElementById('trackingModalContent');
+      content.innerHTML = `
+        <div class="text-center space-y-1">
+          <h4 class="font-black text-slate-900 text-base">${o.jersey}</h4>
+          <p class="text-xs text-slate-500 font-mono">Consignment #${o.consignmentId}</p>
+        </div>
+        <div class="bg-slate-50 p-3 rounded-2xl border space-y-2 text-xs">
+          <div class="flex items-center gap-2 text-emerald-600 font-bold">
+            <i data-lucide="check-circle" class="w-4 h-4"></i> Order Confirmed & Printed
+          </div>
+          <div class="flex items-center gap-2 text-emerald-600 font-bold">
+            <i data-lucide="package" class="w-4 h-4"></i> Quality Packed at Warehouse
+          </div>
+          <div class="flex items-center gap-2 ${o.status === 'Sent to Courier' || o.status === 'Delivered' ? 'text-emerald-600 font-bold' : 'text-slate-400'}">
+            <i data-lucide="truck" class="w-4 h-4"></i> Handed over to ${o.courier}
+          </div>
+        </div>
+      `;
+      document.getElementById('trackingModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeTrackingModal() { document.getElementById('trackingModal').classList.add('hidden'); }
+
+    function searchCrmCustomer() {
+      const p = document.getElementById('crmSearchPhone').value;
+      const card = document.getElementById('crmProfileOutput');
+      if (!p) return;
+      card.innerHTML = `
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-black text-slate-900 text-sm">Customer Record: ${p}</h4>
+              <p class="text-xs text-slate-500 font-mono">Verified across Steadfast & Pathao</p>
+            </div>
+            <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-black">94.2% Trusted</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="bg-slate-50 p-2 rounded-xl"><span class="text-[10px] text-slate-400 block">Total</span><strong class="text-slate-800">12</strong></div>
+            <div class="bg-slate-50 p-2 rounded-xl"><span class="text-[10px] text-emerald-600 block">Delivered</span><strong class="text-emerald-700">11</strong></div>
+            <div class="bg-slate-50 p-2 rounded-xl"><span class="text-[10px] text-rose-500 block">Return</span><strong class="text-rose-600">1</strong></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function generateDailyClosing() {
+      const advTotal = orders.reduce((a,b)=>a+b.advance, 0);
+      const codTotal = orders.reduce((a,b)=>a+b.cod, 0);
+      const text = `📊 NIQUE SPORTS — DAILY CLOSING REPORT\n━━━━━━━━━━━━━━━━━━━━━━\n📦 Total Booked: ${orders.length}\n💰 Total Advance: ৳${advTotal}\n🚚 Total COD Booked: ৳${codTotal}\n✅ Delivered Parcels: ${orders.filter(o=>o.status==='Delivered').length}\n💼 Total Shop Balance: ৳${accounts.Cash+accounts.bKash+accounts.Nagad+accounts.Bank}\n━━━━━━━━━━━━━━━━━━━━━━`;
+      navigator.clipboard.writeText(text);
+      alert("📋 Copied daily closing summary to clipboard!");
+    }
+
+    function syncCouriers() {
+      alert("🔄 Syncing parcel statuses with Steadfast & Pathao APIs...");
+    }
+
+    function saveSettings() {
+      alert("⚙️ Settings updated successfully!");
+    }
+
+    // App Initialization
+    window.onload = () => {
+      updateFinancesUI();
+      renderOrders();
+      renderModBills();
       lucide.createIcons();
     };
   </script>
